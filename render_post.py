@@ -346,7 +346,9 @@ def main():
             if e.code != 404:
                 raise
             print("メッセージが見つからないため、新規投稿します")
-    body, ct = multipart(payload, png)
+    # 新規投稿は、サイレント（通知なし）で送る（flags 4096 = SUPPRESS_NOTIFICATIONS）。
+    # 編集は、もともと通知されない。
+    body, ct = multipart(dict(payload, flags=4096), png)
     res = json.loads(http(webhook + "?wait=true", data=body, method="POST", headers={"Content-Type": ct}))
     ID_FILE.write_text(res["id"])
     print("posted", res["id"])
